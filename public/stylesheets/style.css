@@ -1,8 +1,23 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+* {
+  margin: 0;
+  padding: 0;
 }
 
-a {
-  color: #00B7FF;
+.page {
+  background-color: #24716161;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+.auth-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  max-width: 500px;
+  background-color: #ffffff;
+  box-shadow: grey 0 2px 5px;
+}
+
+.auth-form {
+  margin-bottom: 20px;
 }

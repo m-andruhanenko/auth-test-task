@@ -1,0 +1,10 @@
+.auth-section
+  h2 Login Form
+  form.auth-form(action='/auth/signin' method='POST')
+    div
+      label(for='email') Email
+      input#email(type='text' name='email')
+    div
+      label(for='password') Password
+      input#password(type='password' name='password')
+    button(type='submit') Submit
