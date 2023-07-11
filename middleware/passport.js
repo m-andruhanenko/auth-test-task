@@ -3,7 +3,7 @@ const { ExtractJwt } = require('passport-jwt');
 
 const { SECRET_KEY } = process.env;
 
-const { User } = require('../models');
+const { db } = require('../models');
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -14,7 +14,7 @@ module.exports = (passport) => {
   passport.use(
     new JwtStrategy(options, async (payload, done) => {
       try {
-        const user = await User.findOne({
+        const user = await db.User.findOne({
           where: { id: payload },
           attributes: ['id', 'email'],
         });

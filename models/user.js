@@ -1,11 +1,14 @@
-const bcrypt = require('bcrypt');
-
 const { Model } = require('sequelize');
 
-const SALT_ROUNDS = 10;
-
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {}
+  class User extends Model {
+    static associate(models) {
+      User.hasOne(models.Password, {
+        foreignKey: 'userId',
+        as: 'password',
+      });
+    }
+  }
 
   User.init({
     email: {
@@ -13,13 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
-        notEmpty: true,
-      },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
+        isEmail: true,
         notEmpty: true,
       },
     },
@@ -28,23 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'User',
   });
 
-  User.beforeSave(async (user) => {
-    if (user.password) {
-      user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
-    }
-  });
-
-  User.prototype.comparePassword = function compare(password) {
-    return new Promise((res, rej) => {
-      bcrypt.compare(password, this.password, (err, isMatch) => {
-        if (err) {
-          return rej(err);
-        }
-
-        return res(isMatch);
-      });
-    });
-  };
+  User.sync();
 
   return User;
 };

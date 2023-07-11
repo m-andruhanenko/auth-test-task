@@ -5,7 +5,10 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const passport = require('passport');
 
+const db = require('./models');
+
 const indexRouter = require('./routes/index');
+const userRouter = require('./routes/user');
 const authRouter = require('./routes/auth');
 const {
   NOT_FOUND,
@@ -13,6 +16,7 @@ const {
 } = require('./constants/responseStatuses');
 
 const app = express();
+db.createDbInstance();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -26,6 +30,7 @@ app.use(passport.initialize());
 require('./middleware/passport')(passport);
 
 app.use('/', indexRouter);
+app.use('/user', userRouter);
 app.use('/auth', authRouter);
 
 app.use((req, res, next) => next(createError(NOT_FOUND)));

@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { db } = require('../models');
 const {
   OK,
   BAD_REQUEST,
@@ -6,33 +6,40 @@ const {
 } = require('../constants/responseStatuses');
 const {
   NOT_ALL_DATA,
-  USER_NOT_FOUND,
-  WRONG_PASSWORD,
+  INVALID_DATA,
 } = require('../constants/responseMessages');
 const { createToken } = require('../helpers/createToken');
-const { getUserWithoutPassword } = require('../helpers/getUserWithoutPassword');
+const { getUserWithoutPassword } = require('../utils/getUserWithoutPassword');
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const {
+      email,
+      password,
+    } = req.body;
+
     if (!email.trim() || !password) {
       return res.status(BAD_REQUEST).send(NOT_ALL_DATA);
     }
 
-    const existUser = await User.findOne({
+    const existUser = await db.User.findOne({
       where: { email },
-      attributes: ['id', 'password'],
+      attributes: ['id'],
+    });
+
+    const passwordExistUser = await db.Password.findOne({
+      where: { userId: existUser.dataValues.id },
+      attributes: ['hash'],
     });
 
     if (!existUser) {
-      return res.status(UNAUTHORIZED).send(USER_NOT_FOUND);
+      return res.status(UNAUTHORIZED).send(INVALID_DATA);
     }
 
-    const isPasswordValid = await existUser.comparePassword(password);
+    const isPasswordValid = await passwordExistUser.comparePassword(password);
 
     if (!isPasswordValid) {
-      return res.status(UNAUTHORIZED).send(WRONG_PASSWORD);
+      return res.status(UNAUTHORIZED).send(INVALID_DATA);
     }
 
     const token = createToken(existUser.id);
